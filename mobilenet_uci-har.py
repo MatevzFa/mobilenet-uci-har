@@ -1,19 +1,17 @@
+import os
 import sys
 from pathlib import Path
 from typing import Callable, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sn
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch._C import dtype
 from torch.nn import (AvgPool2d, BatchNorm2d, Conv2d, Linear, MaxPool2d,
                       Module, ReLU, Sequential, Softmax)
-from torchsummary import summary
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sn
 
 import loading
 
@@ -199,67 +197,72 @@ class MobileNet(Classifier):
         super().__init__(convs, linears)
 
 
-def main(do_train, file):
-    path = Path(
-        "/home/matevz/coding/MAG/HAR-pipline/Batch/Data/Original-Data/UCI-HAR-Dataset/Processed-Data")
+def model(file=None):
+    net = MobileNet().float()
+    if file is not None:
+        net.load_state_dict(torch.load(file))
+    return net
 
-    features_txt = path / "features.txt"
+
+def train(lr, nepochs, batch_size):
+    path = Path(os.getenv("HAR_PIPELINE_PATH")) / \
+        "Batch/Data/Original-Data/UCI-HAR-Dataset/Processed-Data"
+
     y_train_txt = path / ".." / "y_train.txt"
-    y_test_txt = path / ".." / "y_test.txt"
-
-    with open(features_txt) as f:
-        features = [l.strip() for l in f.readlines()]
-
-    bs = 128
 
     nn_X_train = torch.tensor(loading.compose("train", np.float32))
     nn_y_train = torch.tensor(np.loadtxt(y_train_txt, dtype=int))
 
-    nn_X_test = torch.tensor(loading.compose("test", np.float32))
-    nn_y_test = torch.tensor(np.loadtxt(y_test_txt, dtype=int))
-
     train_data = torch.utils.data.TensorDataset(nn_X_train, nn_y_train)
     train_loader = torch.utils.data.DataLoader(
-        train_data, batch_size=bs, shuffle=True, num_workers=2)
+        train_data, batch_size=batch_size, shuffle=True, num_workers=2)
 
-    test_data = torch.utils.data.TensorDataset(nn_X_test, nn_y_test)
-    test_loader = torch.utils.data.DataLoader(
-        test_data, batch_size=bs, shuffle=False, num_workers=2)
-
-    net = MobileNet().float()
+    net = model()
 
     print(net)
 
-    if do_train:
+    print(f"train shape = {nn_X_train.shape}")
 
-        criterion = nn.CrossEntropyLoss().float()
-        optimizer = optim.SGD(net.parameters(), lr=0.01)
+    criterion = nn.CrossEntropyLoss().float()
+    optimizer = optim.SGD(net.parameters(), lr=lr)
 
-        every = 3
-        running_loss = 0.0
-        for epoch in range(2):
-            for i, data in enumerate(train_loader, 0):
-                inputs, labels = data
+    every = 3
+    running_loss = 0.0
+    for epoch in range(nepochs):
+        for i, data in enumerate(train_loader, 0):
+            inputs, labels = data
 
-                optimizer.zero_grad()
+            optimizer.zero_grad()
 
-                outputs = net(inputs)
-                loss = criterion(outputs, labels)
-                loss.backward()
-                optimizer.step()
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-                running_loss += loss.item()
-                if i % every == (every-1):
-                    print('[%d, %5d] loss: %.3f' %
-                          (epoch + 1, i + 1, running_loss / every))
-                    running_loss = 0.0
+            running_loss += loss.item()
+            if i % every == (every-1):
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / every))
+                running_loss = 0.0
 
-        print("Done training.")
+    print("Done training.")
 
-        torch.save(net.state_dict(), file)
+    torch.save(net.state_dict(), file)
 
-    else:
-        net.load_state_dict(torch.load(file))
+    return net
+
+
+def eval(net, batch_size):
+    path = Path(os.getenv("HAR_PIPELINE_PATH")) / \
+        "Batch/Data/Original-Data/UCI-HAR-Dataset/Processed-Data"
+
+    y_test_txt = path / ".." / "y_test.txt"
+    nn_X_test = torch.tensor(loading.compose("test", np.float32))
+    nn_y_test = torch.tensor(np.loadtxt(y_test_txt, dtype=int))
+
+    test_data = torch.utils.data.TensorDataset(nn_X_test, nn_y_test)
+    test_loader = torch.utils.data.DataLoader(
+        test_data, batch_size=batch_size, shuffle=False, num_workers=2)
 
     correct = 0
     total = 0
@@ -296,7 +299,7 @@ def main(do_train, file):
     ]
     df_cm = pd.DataFrame(conf_mat, label_names, label_names)
 
-    plt.figure(figsize=(5,5))
+    plt.figure(figsize=(5, 5))
     sn.set(font_scale=.5)
     snplt = sn.heatmap(df_cm, annot=True, cmap="Blues")
     plt.ylabel("Actual")
@@ -309,4 +312,10 @@ if __name__ == '__main__':
     assert len(sys.argv) > 2
     do_train = sys.argv[1] == "train"
     file = sys.argv[2]
-    main(do_train, file)
+
+    if do_train:
+        net = train(lr=0.4, nepochs=5, batch_size=128)
+    else:
+        net = model(file)
+
+    eval(net, batch_size=128)

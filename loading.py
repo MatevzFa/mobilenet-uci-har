@@ -1,10 +1,10 @@
 from pathlib import Path
 import numpy as np
 from collections import defaultdict
+import os
 
-
-base = Path(
-    "/home/matevz/coding/MAG/HAR-pipline/Batch/Data/Original-Data/UCI-HAR-Dataset/Inertial-Signals")
+base = Path(os.getenv("HAR_PIPELINE_PATH")) / \
+    "Batch/Data/Original-Data/UCI-HAR-Dataset/Inertial-Signals"
 
 
 def load(id, axis, mode, dtype):

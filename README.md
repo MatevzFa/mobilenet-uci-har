@@ -1,5 +1,13 @@
 ## MobileNet
 
+### Running training and evaluation of the model
+
+Set environment variable `HAR_PIPELINE_PATH` to the root of your copy of https://github.com/davors/HAR-pipline.
+
+You can set up the Pipenv environment to run `mobilenet_uci-har.py` with the provided `Pipfile`.
+
+### About
+
 Data used was from UCI-HAR dataset. Data from Inertial-Signals were used. This data is filtered using median filter. Accelerometer data is split into 2 components: gravitation and body accelerations, using a low/high pass filter with frequency 0.3Hz. Segment vectors are 128 samples long, sampling rate was 50Hz.
 
 Each `channel` (body_acc, body_gyro, total_acc) is put into a 32x32 single channel image like shown below, resulting in 3x32x32 signal images.
