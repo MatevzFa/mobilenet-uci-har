@@ -25,9 +25,9 @@ Each `channel` (body_acc, body_gyro, total_acc) is put into a 32x32 single chann
 <div class="page"/>
 
 ### mobilenet_uci-har_0.74.pth
-![74](mobilenet_uci-har_0.74.pth.png)
+![74](images/mobilenet_uci-har_0.74.pth.png)
 
 <div class="page"/>
 
 ### mobilenet_uci-har_0.87.pth
-![74](mobilenet_uci-har_0.87.pth.png)
+![74](images/mobilenet_uci-har_0.87.pth.png)
