@@ -6,6 +6,12 @@ Set environment variable `HAR_PIPELINE_PATH` to the root of your copy of https:/
 
 You can set up the Pipenv environment to run `mobilenet_uci-har.py` with the provided `Pipfile`.
 
+Run the model with the following command. Select whether you want to train the network. Pass a path to the file where you want the PyTorch checkpoint to be created after training. This value is also used when evaluating an trained model.
+
+```
+python mobilenet_uci-har.py train|test path_to_pytorch_checkpoint.pth
+```
+
 ### Acknowledgment
 
 The neural networks descriptions found in python scripts were taken from the [ApproxHPVM](https://gitlab.engr.illinois.edu/llvm/hpvm-release). [Direct link to the directory where you can find them](https://gitlab.engr.illinois.edu/llvm/hpvm-release/-/tree/main/hpvm/test/dnn_benchmarks/pytorch/dnn).
