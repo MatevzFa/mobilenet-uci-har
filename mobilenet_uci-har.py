@@ -264,6 +264,8 @@ def eval(net, batch_size):
     test_loader = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False, num_workers=2)
 
+    print(f"test shape = {nn_X_test.shape}")
+
     correct = 0
     total = 0
     predictions = []
