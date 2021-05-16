@@ -6,6 +6,10 @@ Set environment variable `HAR_PIPELINE_PATH` to the root of your copy of https:/
 
 You can set up the Pipenv environment to run `mobilenet_uci-har.py` with the provided `Pipfile`.
 
+### Acknowledgment
+
+The neural networks descriptions found in python scripts were taken from the [ApproxHPVM](https://gitlab.engr.illinois.edu/llvm/hpvm-release). [Direct link to the directory where you can find them](https://gitlab.engr.illinois.edu/llvm/hpvm-release/-/tree/main/hpvm/test/dnn_benchmarks/pytorch/dnn).
+
 ### About
 
 Data used was from UCI-HAR dataset. Data from Inertial-Signals were used. This data is filtered using median filter. Accelerometer data is split into 2 components: gravitation and body accelerations, using a low/high pass filter with frequency 0.3Hz. Segment vectors are 128 samples long, sampling rate was 50Hz.
@@ -33,9 +37,9 @@ Each `channel` (body_acc, body_gyro, total_acc) is put into a 32x32 single chann
 <div class="page"/>
 
 ### mobilenet_uci-har_0.74.pth
-![74](images/mobilenet_uci-har_0.74.pth.png)
+![confusion matrix, 74%](images/mobilenet_uci-har_0.74.pth.png)
 
 <div class="page"/>
 
 ### mobilenet_uci-har_0.87.pth
-![74](images/mobilenet_uci-har_0.87.pth.png)
+![confusion matrix, 87%](images/mobilenet_uci-har_0.87.pth.png)
