@@ -193,7 +193,7 @@ class MobileNet(Classifier):
             ReLU(),
             AvgPool2d(2)
         )
-        linears = Sequential(Linear(1024, 10))
+        linears = Sequential(Linear(1024, 6))
         super().__init__(convs, linears)
 
 
@@ -211,7 +211,7 @@ def train(lr, nepochs, batch_size):
     y_train_txt = path / ".." / "y_train.txt"
 
     nn_X_train = torch.tensor(loading.compose("train", np.float32))
-    nn_y_train = torch.tensor(np.loadtxt(y_train_txt, dtype=int))
+    nn_y_train = torch.tensor(np.loadtxt(y_train_txt, dtype=int) - 1)
 
     train_data = torch.utils.data.TensorDataset(nn_X_train, nn_y_train)
     train_loader = torch.utils.data.DataLoader(
@@ -227,8 +227,8 @@ def train(lr, nepochs, batch_size):
     optimizer = optim.SGD(net.parameters(), lr=lr)
 
     every = 3
-    running_loss = 0.0
     for epoch in range(nepochs):
+        running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data
 
@@ -241,9 +241,11 @@ def train(lr, nepochs, batch_size):
 
             running_loss += loss.item()
             if i % every == (every-1):
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / every))
+                print('[%d, %5d, lr=%.3f] loss: %.3f' %
+                      (epoch + 1, i + 1, lr, running_loss / every))
                 running_loss = 0.0
+        if epoch % 5 == 4:
+            lr /= 2
 
     print("Done training.")
 
@@ -258,7 +260,7 @@ def eval(net, batch_size):
 
     y_test_txt = path / ".." / "y_test.txt"
     nn_X_test = torch.tensor(loading.compose("test", np.float32))
-    nn_y_test = torch.tensor(np.loadtxt(y_test_txt, dtype=int))
+    nn_y_test = torch.tensor(np.loadtxt(y_test_txt, dtype=int) - 1)
 
     test_data = torch.utils.data.TensorDataset(nn_X_test, nn_y_test)
     test_loader = torch.utils.data.DataLoader(
@@ -316,7 +318,7 @@ if __name__ == '__main__':
     file = sys.argv[2]
 
     if do_train:
-        net = train(lr=0.4, nepochs=5, batch_size=128)
+        net = train(lr=0.8, nepochs=11, batch_size=128)
     else:
         net = model(file)
 

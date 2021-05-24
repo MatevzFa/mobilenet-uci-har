@@ -35,17 +35,24 @@ Each `channel` (body_acc, body_gyro, total_acc) is put into a 32x32 single chann
 ]
 ```
 
-| epochs | learning rate | accuracy | file                       |
-| -----: | ------------: | -------: | -------------------------- |
-|      2 |          0.10 |      74% | mobilenet_uci-har_0.74.pth |
-|      5 |          0.40 |      87% | mobilenet_uci-har_0.87.pth |
+| epochs | learning rate | accuracy | file                       |                                          |
+| -----: | ------------: | -------: | -------------------------- | ---------------------------------------- |
+|      2 |          0.10 |      74% | mobilenet_uci-har_0.74.pth |                                          |
+|      5 |          0.40 |      87% | mobilenet_uci-har_0.87.pth |                                          |
+|     11 |   0.80-0.20\* |      87% | mobilenet_uci-har_0.90.pth | \*Learning rate is halved every 5 epochs |
 
 <div class="page"/>
 
 ### mobilenet_uci-har_0.74.pth
+
 ![confusion matrix, 74%](images/mobilenet_uci-har_0.74.pth.png)
 
 <div class="page"/>
 
 ### mobilenet_uci-har_0.87.pth
+
 ![confusion matrix, 87%](images/mobilenet_uci-har_0.87.pth.png)
+
+### mobilenet_uci-har_0.87.pth
+
+![confusion matrix, 87%](images/mobilenet_uci-har_0.90.pth.png)
