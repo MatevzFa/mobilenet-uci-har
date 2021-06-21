@@ -41,20 +41,15 @@ def main():
     har_data_path = Path(env("HAR_PIPELINE_PATH")) / \
         "Batch/Data/Original-Data/UCI-HAR-Dataset/Processed-Data"
 
-    y_train_txt = har_data_path / ".." / "y_train.txt"
     y_test_txt = har_data_path / ".." / "y_test.txt"
 
-    train_data = loading.compose("train", np.float32)
     test_data = loading.compose("test", np.float32)
+    test_labels = np.loadtxt(y_test_txt, dtype=np.int32) - 1
 
-    train_labels = np.loadtxt(y_train_txt, dtype=np.int32)-1
-    test_labels = np.loadtxt(y_test_txt, dtype=np.int32)-1
-
-    print(np.unique(train_labels))
     print(np.unique(test_labels))
 
-    full_input = np.concatenate([train_data, test_data], axis=0)
-    full_labels = np.concatenate([train_labels, test_labels], axis=0)
+    full_input = test_data
+    full_labels = test_labels
 
     assert len(full_input) == len(full_labels)
     permutation = np.random.permutation(len(full_input))
@@ -71,7 +66,7 @@ def main():
     print(f"full_data={full_input.shape}")
     print(f"full_labels={full_labels.shape}")
 
-    n = 5000
+    n = 1450
     tune_input, test_input = parts(full_input, n)
     tune_labels, test_labels = parts(full_labels, n)
 
@@ -81,6 +76,7 @@ def main():
     print(f"test_labels={test_labels.shape}")
 
     bin_base = Path(env("HPVM_MODEL_PARAMS_PATH")) / "mobilenet_uci-har"
+    os.makedirs(bin_base, exist_ok=True)
 
     save(tune_input, bin_base, "tune_input.bin")
     save(test_input, bin_base, "test_input.bin")
