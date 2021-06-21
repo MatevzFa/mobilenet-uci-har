@@ -47,8 +47,11 @@ def main():
     train_data = loading.compose("train", np.float32)
     test_data = loading.compose("test", np.float32)
 
-    train_labels = np.loadtxt(y_train_txt, dtype=np.int32)
-    test_labels = np.loadtxt(y_test_txt, dtype=np.int32)
+    train_labels = np.loadtxt(y_train_txt, dtype=np.int32)-1
+    test_labels = np.loadtxt(y_test_txt, dtype=np.int32)-1
+
+    print(np.unique(train_labels))
+    print(np.unique(test_labels))
 
     full_input = np.concatenate([train_data, test_data], axis=0)
     full_labels = np.concatenate([train_labels, test_labels], axis=0)
@@ -56,8 +59,14 @@ def main():
     assert len(full_input) == len(full_labels)
     permutation = np.random.permutation(len(full_input))
 
-    full_input[:, :, :, :] = full_input[permutation, :, :, :]
+    full_input_bak = np.copy(full_input)
+    full_labels_bak = np.copy(full_labels)
+
+    full_input[:] = full_input[permutation]
     full_labels[:] = full_labels[permutation]
+
+    assert np.all(full_input[0] == full_input_bak[permutation[0]])
+    assert np.all(full_labels[0] == full_labels_bak[permutation[0]])
 
     print(f"full_data={full_input.shape}")
     print(f"full_labels={full_labels.shape}")
