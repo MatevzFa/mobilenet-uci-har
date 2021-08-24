@@ -146,8 +146,6 @@ def train(lr, nepochs, batch_size):
                 print('[%d, %5d, lr=%.3f] loss: %.3f' %
                       (epoch + 1, i + 1, lr, running_loss / every))
                 running_loss = 0.0
-        if epoch % 5 == 4:
-            lr /= 2
 
     print("Done training.")
 
